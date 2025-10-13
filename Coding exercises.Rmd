@@ -1,0 +1,51 @@
+---
+title: "Coding Exercises"
+author: "Taia Storrs"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data("knz_bison")
+```
+
+Create a new column in the bison dataset that calculates the individual’s age at the time of observation.
+
+```{r}
+knz_bison <- knz_bison %>%
+  mutate(age = rec_year - animal_yob)
+```
+
+Write a function that will first filter the bison dataset based on any user-specified weight threshold (returning the filtered dataset).
+
+```{r}
+bison_weight <- function(knz_bison, weight_threshold) {
+  filtered_data <- knz_bison %>%
+    filter(animal_weight > weight_threshold)
+  
+   return(filtered_data)
+}
+```
+
+Example
+```{r}
+bison_over_600 <- bison_weight(knz_bison, 600)
+```
+
+Create a boxplot showing weight distribution between male and female bison, and then conduct a t-test to see if weight is significantly difference between males and females.
+
+```{r}
+ggplot(knz_bison, aes(x = animal_sex, y = animal_weight, fill = animal_sex)) +
+  geom_boxplot() +
+  labs(
+    x = "Sex",
+    y = "Weight (kg)"
+  ) +
+  scale_fill_manual(values = c("M" = "goldenrod2", "F" = "slateblue")) +
+  theme_minimal()
+```
+
