@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Part 1
 ```{r}
 data("knz_bison")
 ```
@@ -47,5 +48,72 @@ ggplot(knz_bison, aes(x = animal_sex, y = animal_weight, fill = animal_sex)) +
   ) +
   scale_fill_manual(values = c("M" = "goldenrod2", "F" = "slateblue")) +
   theme_minimal()
+```
+
+Part 2
+```{r}
+data <- read.csv("Intro-Git-GitHub/data/kenya_county_climates.csv")
+```
+
+```{r}
+precip_data <- data %>%
+  select(County, contains("Precipitation")) %>%
+  filter(Precipitation_585_90 > mean(Precipitation_585_90, na.rm = TRUE)) %>%
+  pivot_longer(
+    cols = contains("Precipitation"),
+    names_to = "Precip_Variable",
+    values_to = "Precip_Value"
+  )
+```
+
+```{r}
+precip_data%>%
+  distinct(County) %>% 
+  count()
+```
+
+22 counties have predicted precip values greater than the total county average
+
+```{r}
+precip_data %>%
+  ggplot(aes(x = County, y = Precip_Value, fill = Precip_Variable)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~Precip_Variable, scales = "free_y") +
+  labs(
+    title = "Predicted Precipitation by County and Time Frame",
+    x = "County",
+    y = "Precipitation",
+    fill = "Time Frame"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
+
+```{r}
+county_list <- unique(precip_data$County)
+
+plots <- map(county_list, ~{
+  precip_data %>%
+    filter(County == .x) %>%
+    ggplot(aes(x = Precip_Variable, y = Precip_Value, fill = Precip_Variable)) +
+    geom_col() +
+    labs(
+      title = paste("Predicted Precipitation for", .x),
+      x = "Precipitation Variable",
+      y = "Precipitation",
+      fill = "Scenario"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "none",
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+})
+
+plots[[1]]
+
 ```
 
